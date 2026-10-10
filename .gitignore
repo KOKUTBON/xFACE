@@ -1,0 +1,95 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+wheels/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE / editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Environment & local credentials
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Secrets and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+secrets/
+credentials/
+
+# Runtime data: database, face snapshots, uploads, exports
+# These contain biometric/personal data and must never be committed.
+data/
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+snapshots/
+uploads/
+artifacts/
+outputs/
+reports/
+backups/
+dumps/
+*.csv
+
+# Logs & temporary files
+*.log
+logs/
+tmp/
+temp/
+
+# Test & lint caches
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# AI development tools
+.claude/
+.codex/
+.cursor/
+.windsurf/
+.github/agents/
+
+# Local browser verification artifacts
+.playwright-cli/
+output/playwright/
+
+# Local deployment records and private credentials
+.env.local
+.env.production
+*.pem
+*.key
+*.sqlite
+*.sqlite3
+*.db
+/data/private/
+/backups/

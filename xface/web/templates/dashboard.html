@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+
+{% block title %}Subjects &amp; faces{% endblock %}
+{% block page_id %}subjects{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <span class="eyebrow">Enrollment</span>
+        <h1>Subjects &amp; faces</h1>
+        <p>Enroll people, curate their biometric face samples and control the recognition engine.</p>
+    </div>
+    <div class="actions">
+        <button class="btn" id="btn-restart-camera" type="button" title="Release and reopen the camera device">{{ icon('power') }} Restart camera</button>
+        <button class="btn btn-icon" id="btn-refresh-subjects" type="button" title="Refresh" aria-label="Refresh subjects">{{ icon('refresh') }}</button>
+        <button class="btn btn-primary" type="button" data-open="modalAddSubject">{{ icon('user-plus') }} New subject</button>
+    </div>
+</div>
+
+<div class="stats">
+    <article class="stat">
+        <span class="stat-label">Enrolled subjects</span>
+        <span class="stat-icon">{{ icon('subjects') }}</span>
+        <span class="stat-value" id="stat-total-subjects">—</span>
+        <span class="stat-note">Identities in the gallery</span>
+    </article>
+    <article class="stat ok">
+        <span class="stat-label">Face samples</span>
+        <span class="stat-icon">{{ icon('face-id') }}</span>
+        <span class="stat-value" id="stat-total-photos">—</span>
+        <span class="stat-note" id="stat-samples-note">Avg. per subject —</span>
+    </article>
+    <article class="stat manual">
+        <span class="stat-label">Recognition engine</span>
+        <span class="stat-icon">{{ icon('neural') }}</span>
+        <span class="stat-value"><span class="tag neutral" id="stat-recognition-badge">…</span></span>
+        <span class="stat-note">
+            <label class="switch">
+                <input type="checkbox" role="switch" id="toggle-recognition" disabled>
+                <span class="track"></span>
+                <span>Auto-recognition</span>
+            </label>
+            <span id="stat-recognition-details" class="mono"></span>
+        </span>
+    </article>
+    <article class="stat warn">
+        <span class="stat-label">Match threshold</span>
+        <span class="stat-icon">{{ icon('gauge') }}</span>
+        <span class="stat-value" id="stat-threshold">—</span>
+        <span class="stat-note" style="display:block">
+            <span class="meter"><span id="stat-threshold-bar"></span></span>
+        </span>
+    </article>
+</div>
+
+<div class="toolbar">
+    <div class="input-icon">
+        {{ icon('search') }}
+        <input type="search" class="input" id="subject-search-input" data-search placeholder="Search subjects by name" aria-label="Search subjects">
+        <span class="kbd" aria-hidden="true">/</span>
+    </div>
+    <span class="count" id="subject-count"></span>
+</div>
+
+<div class="subject-grid" id="subjects-grid" aria-live="polite">
+    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+</div>
+
+<!-- Dialog: New Subject -->
+<dialog class="modal" id="modalAddSubject" aria-labelledby="modalAddSubjectTitle">
+    <form id="form-add-subject" data-photo-form>
+        <div class="modal-head">
+            <span class="m-icon">{{ icon('user-plus') }}</span>
+            <div><h2 id="modalAddSubjectTitle">Enroll new subject</h2><p>One clear, front-facing face per photo.</p></div>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-close aria-label="Close">{{ icon('x') }}</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label for="new-subject-name" class="label">Full name</label>
+                <input type="text" class="input" id="new-subject-name" required maxlength="128" placeholder="e.g. Jane Doe" autocomplete="off">
+            </div>
+            {% set photo_form_id = "new" %}
+            {% include "_photo_source.html" %}
+            <p class="hint" style="margin-top:12px">{{ icon('info', 'i-sm') }} Use a well-lit photo with a single face, no sunglasses or heavy shadows.</p>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn" data-close>Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-save-subject">{{ icon('check') }} Enroll subject</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Dialog: Add Photo to Existing Subject -->
+<dialog class="modal" id="modalAddPhoto" aria-labelledby="modalAddPhotoTitle">
+    <form id="form-add-photo" data-photo-form>
+        <input type="hidden" id="add-photo-subject-name">
+        <div class="modal-head">
+            <span class="m-icon">{{ icon('face-id') }}</span>
+            <div style="min-width:0"><h2 id="modalAddPhotoTitle">Add face sample</h2><p id="add-photo-subject-title"></p></div>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-close aria-label="Close">{{ icon('x') }}</button>
+        </div>
+        <div class="modal-body">
+            {% set photo_form_id = "extra" %}
+            {% include "_photo_source.html" %}
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn" data-close>Close</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-photo">{{ icon('upload') }} Upload sample</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Dialog: Rename Subject -->
+<dialog class="modal" id="modalRenameSubject" aria-labelledby="modalRenameSubjectTitle">
+    <form id="form-rename-subject">
+        <input type="hidden" id="rename-old-name">
+        <div class="modal-head">
+            <span class="m-icon">{{ icon('pen') }}</span>
+            <div><h2 id="modalRenameSubjectTitle">Rename subject</h2></div>
+            <button type="button" class="btn btn-ghost btn-icon btn-sm" data-close aria-label="Close">{{ icon('x') }}</button>
+        </div>
+        <div class="modal-body">
+            <div class="field">
+                <label for="rename-new-name" class="label">New name</label>
+                <input type="text" class="input" id="rename-new-name" required maxlength="128" autocomplete="off">
+                <span class="hint">Existing access logs keep the name that was recorded at the time.</span>
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn" data-close>Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-rename-subject">{{ icon('check') }} Rename</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Dialog: Subject Photo Gallery -->
+<dialog class="modal wide" id="modalSubjectGallery" aria-labelledby="modalSubjectGalleryTitle">
+    <div class="modal-head">
+        <span class="m-icon">{{ icon('gallery') }}</span>
+        <div style="min-width:0"><h2 id="modalSubjectGalleryTitle"><span id="gallery-subject-name"></span></h2><p id="gallery-subject-meta">Face samples</p></div>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-close aria-label="Close">{{ icon('x') }}</button>
+    </div>
+    <div class="modal-body">
+        <div class="gallery" id="gallery-images-container"></div>
+    </div>
+    <div class="modal-foot">
+        <button type="button" class="btn" data-close>Close</button>
+        <button type="button" class="btn btn-primary" id="btn-gallery-add">{{ icon('plus') }} Add sample</button>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

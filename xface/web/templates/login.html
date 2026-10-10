@@ -1,0 +1,75 @@
+{% from "_macros.html" import icon, flash_messages %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070a0f">
+    <title>Sign in · xFACE Access Control</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</head>
+<body>
+    {% include "_icons.html" %}
+    <div class="auth">
+        <section class="auth-visual">
+            <a class="brand" href="{{ url_for('dashboard.index') }}">
+                <span class="brand-mark">{{ icon('logo') }}</span>
+                <span><span class="brand-name">x<b>FACE</b></span><span class="brand-sub">Access control</span></span>
+            </a>
+            {% include "_scan_hero.html" %}
+            <div class="auth-copy">
+                <h2>Your door, recognised in under a second.</h2>
+                <p>Self-hosted facial recognition gateway. Biometric data never leaves your hardware.</p>
+                <div class="auth-feats">
+                    <span>{{ icon('shield') }} Self-hosted</span>
+                    <span>{{ icon('scan-face') }} Sub-second match</span>
+                    <span>{{ icon('audit') }} Full audit trail</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-panel">
+            <form class="auth-form" method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+                <span class="eyebrow">Operator console</span>
+                <h1>Sign in to xFACE</h1>
+                <p>Enter the administrator password to manage subjects and review the audit trail.</p>
+
+                {{ flash_messages() }}
+
+                <div class="field">
+                    <label class="label" for="password">Admin password</label>
+                    <div class="input-icon">
+                        {{ icon('lock') }}
+                        <input type="password" class="input" id="password" name="password" required autofocus autocomplete="current-password" placeholder="••••••••••">
+                        <button type="button" class="btn btn-ghost btn-icon btn-sm pw-toggle" id="pw-toggle" aria-label="Show password" aria-pressed="false">{{ icon('eye') }}</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg btn-block">{{ icon('login') }} Sign in</button>
+
+                <div class="auth-alt">
+                    {% if not monitor_require_login %}
+                    <a href="{{ url_for('dashboard.live_monitor') }}">{{ icon('scan-face', 'i-sm') }} Open the live monitor</a>
+                    {% else %}
+                    <span>{{ icon('shield', 'i-sm') }} Session secured</span>
+                    {% endif %}
+                    <button type="button" class="btn btn-ghost btn-icon btn-sm" data-theme-toggle aria-label="Toggle color theme"><svg class="i" aria-hidden="true"><use href="#i-sun"/></svg></button>
+                </div>
+            </form>
+        </section>
+    </div>
+    <script>
+        document.getElementById('pw-toggle').addEventListener('click', function () {
+            var input = document.getElementById('password');
+            var show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            this.setAttribute('aria-pressed', String(show));
+            this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        });
+    </script>
+</body>
+</html>

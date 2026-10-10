@@ -1,0 +1,86 @@
+{
+  "synthetic": true,
+  "date": "2026-10-05",
+  "subjects": [
+    {
+      "name": "Alex Morgan",
+      "team": "Research team",
+      "samples": 4
+    },
+    {
+      "name": "Jamie Chen",
+      "team": "Engineering",
+      "samples": 3
+    },
+    {
+      "name": "Sam Rivera",
+      "team": "Design studio",
+      "samples": 5
+    },
+    {
+      "name": "Taylor Brooks",
+      "team": "Operations",
+      "samples": 3
+    },
+    {
+      "name": "Jordan Lee",
+      "team": "Engineering",
+      "samples": 4
+    },
+    {
+      "name": "Casey Patel",
+      "team": "Research team",
+      "samples": 2
+    }
+  ],
+  "events": [
+    {
+      "time": "10:42:18",
+      "subject": "Alex Morgan",
+      "status": "GRANTED",
+      "similarity": 98.4
+    },
+    {
+      "time": "10:40:52",
+      "subject": "Jamie Chen",
+      "status": "GRANTED",
+      "similarity": 96.7
+    },
+    {
+      "time": "10:38:09",
+      "subject": "Unknown visitor",
+      "status": "UNKNOWN",
+      "similarity": 42.1
+    },
+    {
+      "time": "10:35:41",
+      "subject": "Sam Rivera",
+      "status": "GRANTED",
+      "similarity": 97.2
+    },
+    {
+      "time": "10:31:26",
+      "subject": "Taylor Brooks",
+      "status": "DENIED",
+      "similarity": 78.6
+    },
+    {
+      "time": "10:28:03",
+      "subject": "Demo operator",
+      "status": "MANUAL_OPEN",
+      "similarity": null
+    },
+    {
+      "time": "10:24:17",
+      "subject": "Jordan Lee",
+      "status": "GRANTED",
+      "similarity": 95.8
+    },
+    {
+      "time": "10:21:05",
+      "subject": "Casey Patel",
+      "status": "GRANTED",
+      "similarity": 99.1
+    }
+  ]
+}

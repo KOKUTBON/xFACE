@@ -1,0 +1,14 @@
+{% macro icon(name, cls='') -%}
+<svg class="i {{ cls }}" aria-hidden="true" focusable="false"><use href="#i-{{ name }}"/></svg>
+{%- endmacro %}
+
+{% macro flash_messages() -%}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}
+<div class="flash {{ category }}" role="alert">
+    {{ icon({'success': 'check', 'danger': 'alert', 'warning': 'alert'}.get(category, 'info')) }}
+    <span>{{ message }}</span>
+</div>
+{% endfor %}
+{% endwith %}
+{%- endmacro %}

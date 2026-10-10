@@ -1,0 +1,91 @@
+{% from "_macros.html" import icon, flash_messages %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070a0f">
+    <title>{% block title %}xFACE{% endblock %} · xFACE Access Control</title>
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body data-logged-in="{{ 'true' if session.get('logged_in') else 'false' }}" data-page="{% block page_id %}{% endblock %}">
+    {% include "_icons.html" %}
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="shell">
+        <aside class="sidebar" id="sidebar" aria-label="Primary">
+            <a class="brand" href="{{ url_for('dashboard.index') }}">
+                <span class="brand-mark">{{ icon('logo') }}</span>
+                <span><span class="brand-name">x<b>FACE</b></span><span class="brand-sub">Access control</span></span>
+            </a>
+
+            <div class="nav-label">Operations</div>
+            <nav class="nav" aria-label="Main navigation">
+                {% if session.get('logged_in') %}
+                <a href="{{ url_for('dashboard.admin_dashboard') }}" {% if request.endpoint == 'dashboard.admin_dashboard' %}aria-current="page"{% endif %}>
+                    {{ icon('subjects') }} Subjects &amp; faces
+                </a>
+                {% endif %}
+                <a href="{{ url_for('dashboard.live_monitor') }}" {% if request.endpoint == 'dashboard.live_monitor' %}aria-current="page"{% endif %}>
+                    {{ icon('scan-face') }} Live monitor
+                </a>
+                {% if session.get('logged_in') %}
+                <a href="{{ url_for('dashboard.access_logs') }}" {% if request.endpoint == 'dashboard.access_logs' %}aria-current="page"{% endif %}>
+                    {{ icon('audit') }} Access logs
+                </a>
+                {% endif %}
+            </nav>
+
+            <section class="health" aria-label="System health">
+                <div class="health-title"><span>System health</span><span class="dot" id="health-overall"></span></div>
+                <div class="health-row" id="health-camera">{{ icon('camera') }} Camera <span class="state"><span class="dot"></span></span></div>
+                <div class="health-row" id="health-ai">{{ icon('neural') }} Recognition AI <span class="state"><span class="dot"></span></span></div>
+                <div class="health-row" id="health-relay">{{ icon('relay') }} Door relay <span class="state"><span class="dot"></span></span></div>
+            </section>
+
+            <div class="sidebar-foot">
+                <span class="version">v{{ app_version }}</span>
+                <button class="btn btn-ghost btn-icon btn-sm" type="button" data-theme-toggle aria-label="Toggle color theme">
+                    <svg class="i" aria-hidden="true"><use href="#i-sun"/></svg>
+                </button>
+                {% if session.get('logged_in') %}
+                <a class="btn btn-ghost btn-icon btn-sm" href="{{ url_for('auth.logout') }}" title="Sign out" aria-label="Sign out">{{ icon('logout') }}</a>
+                {% endif %}
+            </div>
+        </aside>
+        <div class="scrim" data-nav-close></div>
+
+        <div class="main">
+            <header class="topbar">
+                <button class="btn btn-ghost btn-icon menu-btn" type="button" data-nav-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation">{{ icon('menu') }}</button>
+                <div class="crumbs"><span>xFACE</span><span class="sep">/</span><strong>{{ self.title() }}</strong></div>
+                <div class="topbar-right">
+                    <span class="clock" data-clock aria-label="Current time">--:--:--</span>
+                    {% if session.get('logged_in') %}
+                    <button class="btn btn-ok" id="btn-manual-unlock" type="button" title="Manually trigger the door relay">
+                        {{ icon('unlock') }} <span>Open door</span>
+                    </button>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary">{{ icon('login') }} Sign in</a>
+                    {% endif %}
+                </div>
+            </header>
+
+            <main class="content" id="main">
+                {{ flash_messages() }}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
