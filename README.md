@@ -54,9 +54,65 @@ Commercial biometric turnstiles, badge readers, and proprietary facial recogniti
 
 In addition to day-to-day access control, xFACE serves as a practical, open foundation for **biometrics research and edge computer vision experimentation**: every recognition event logs similarity scores, detection probabilities, bounding boxes, and timestamped frames ready for CSV export and statistical evaluation.
 
-### Search Keywords & Indexing
-- **Primary Keywords**: Open Source Facial Recognition Access Control, Biometric Door Lock System Python, CompreFace Smart Lock Integration, Shelly Relay Door Opener, Face Recognition Edge AI Kiosk, Raspberry Pi Biometric Security Gateway, Real-Time Computer Vision Door Strike, xFACE Biometric Security.
-- **Classification**: Physical Access Control System (PACS), Biometrics, Computer Vision, Edge AI, Smart Building Automation, IoT Relay Controller.
+
+## Quick Start
+
+### Requirements
+
+- Linux, macOS, or Windows
+- Python 3.10+ **or** Docker with Docker Compose
+- A standard USB webcam, an RTSP IP camera, or a video file for testing
+- A running CompreFace instance (included in the Docker Compose setup)
+- *(Optional)* A Shelly smart relay wired to an electric door strike
+
+---
+
+### Option A: Docker Compose
+
+Run the public synthetic demo with a single command:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/KOKUTBON/xFACE.git
+cd xFACE
+
+# 2. Configure environment parameters
+cp .env.example .env
+
+# 3. Launch the mock-only xFACE demo (no CompreFace, camera, or relay is contacted)
+docker compose up -d
+```
+
+Access the interfaces:
+- **xFACE Dashboard**: [http://localhost:5000/dashboard](http://localhost:5000/dashboard) (set `DASHBOARD_PASSWORD`, or read the first-install credential from `DATA_DIR/.admin_password`)
+- **Live Entrance Kiosk**: [http://localhost:5000/monitor](http://localhost:5000/monitor)
+- **Historical Access Logs**: [http://localhost:5000/logs](http://localhost:5000/logs)
+
+To start the optional real CompreFace stack, set `DEMO_MODE=false`, configure all production secrets and private URLs, and start with `COMPREFACE_POSTGRES_PASSWORD` plus `docker compose --profile production up -d`. Review [SECURITY.md](SECURITY.md) first.
+
+---
+
+### Option B: Local Virtual Environment
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/KOKUTBON/xFACE.git
+cd xFACE
+
+# 2. Create and activate a Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# 3. Install production dependencies
+pip install -r requirements.txt
+
+# 4. Configure environment parameters
+cp .env.example .env
+# Edit .env with your CompreFace API_KEY and SHELLY_URL
+
+# 5. Start xFACE
+python run.py
+```
 
 ---
 
@@ -181,66 +237,6 @@ flowchart TD
 
 ---
 
-## Quick Start
-
-### Requirements
-
-- Linux, macOS, or Windows
-- Python 3.10+ **or** Docker with Docker Compose
-- A standard USB webcam, an RTSP IP camera, or a video file for testing
-- A running CompreFace instance (included in the Docker Compose setup)
-- *(Optional)* A Shelly smart relay wired to an electric door strike
-
----
-
-### Option A: Docker Compose
-
-Run the public synthetic demo with a single command:
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/KOKUTBON/xFACE.git
-cd xFACE
-
-# 2. Configure environment parameters
-cp .env.example .env
-
-# 3. Launch the mock-only xFACE demo (no CompreFace, camera, or relay is contacted)
-docker compose up -d
-```
-
-Access the interfaces:
-- **xFACE Dashboard**: [http://localhost:5000/dashboard](http://localhost:5000/dashboard) (set `DASHBOARD_PASSWORD`, or read the first-install credential from `DATA_DIR/.admin_password`)
-- **Live Entrance Kiosk**: [http://localhost:5000/monitor](http://localhost:5000/monitor)
-- **Historical Access Logs**: [http://localhost:5000/logs](http://localhost:5000/logs)
-
-To start the optional real CompreFace stack, set `DEMO_MODE=false`, configure all production secrets and private URLs, and start with `COMPREFACE_POSTGRES_PASSWORD` plus `docker compose --profile production up -d`. Review [SECURITY.md](SECURITY.md) first.
-
----
-
-### Option B: Local Virtual Environment
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/KOKUTBON/xFACE.git
-cd xFACE
-
-# 2. Create and activate a Python virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# 3. Install production dependencies
-pip install -r requirements.txt
-
-# 4. Configure environment parameters
-cp .env.example .env
-# Edit .env with your CompreFace API_KEY and SHELLY_URL
-
-# 5. Start xFACE
-python run.py
-```
-
----
 
 ## Configuration Reference
 
