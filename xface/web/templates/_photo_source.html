@@ -1,0 +1,38 @@
+{# Shared photo picker: file upload or webcam capture. Scoped by the enclosing [data-photo-form].
+   Set photo_form_id before including so ids stay unique per form. #}
+{% from "_macros.html" import icon %}
+<div class="field">
+    <span class="label" id="photo-source-label-{{ photo_form_id }}">Photo source</span>
+    <div class="seg" role="radiogroup" aria-labelledby="photo-source-label-{{ photo_form_id }}">
+        <input type="radio" name="photo-source-{{ photo_form_id }}" id="photo-source-{{ photo_form_id }}-file" value="file" data-photo-source checked>
+        <label for="photo-source-{{ photo_form_id }}-file">{{ icon('upload') }} Upload file</label>
+        <input type="radio" name="photo-source-{{ photo_form_id }}" id="photo-source-{{ photo_form_id }}-webcam" value="webcam" data-photo-source>
+        <label for="photo-source-{{ photo_form_id }}-webcam">{{ icon('camera') }} Live camera</label>
+    </div>
+</div>
+
+<div class="field" data-photo-pane="file">
+    <label class="dropzone" data-dropzone>
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/bmp" data-photo-file aria-label="Photo file">
+        <span data-dropzone-prompt>
+            {{ icon('image') }}
+            <strong>Drop a portrait or click to browse</strong><br>
+            <small>JPG, PNG, WebP or BMP · max 16 MB</small>
+        </span>
+        <img alt="Selected photo preview" data-photo-file-preview hidden>
+    </label>
+</div>
+
+<div class="field" data-photo-pane="webcam" hidden>
+    <div class="webcam-box reticle">
+        <span class="r-t"></span><span class="r-b"></span>
+        <img alt="Live camera preview" data-webcam-live>
+    </div>
+    <div class="capture-row">
+        <button type="button" class="btn btn-primary btn-sm" data-webcam-capture>{{ icon('aperture') }} Capture frame</button>
+        <div data-webcam-result hidden style="display:flex;align-items:center;gap:10px">
+            <img alt="Captured photo" data-webcam-captured>
+            <span class="tag ok">{{ icon('check') }} Captured</span>
+        </div>
+    </div>
+</div>

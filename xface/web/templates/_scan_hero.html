@@ -1,0 +1,28 @@
+{# Decorative animated face-mesh scan used on the sign-in screen. #}
+<div class="scan-hero" aria-hidden="true">
+    <svg viewBox="0 0 300 300">
+        <defs>
+            <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#5ce1ff" stop-opacity="0"/>
+                <stop offset=".85" stop-color="#5ce1ff" stop-opacity=".22"/>
+                <stop offset="1" stop-color="#5ce1ff" stop-opacity=".9"/>
+            </linearGradient>
+            <clipPath id="scan-clip"><rect x="62" y="52" width="176" height="196" rx="18"/></clipPath>
+        </defs>
+        <circle class="orbit" cx="150" cy="150" r="142"/>
+        <circle class="orbit o2" cx="150" cy="150" r="124"/>
+        <path class="corners" d="M62 86V70a18 18 0 0 1 18-18h16M204 52h16a18 18 0 0 1 18 18v16M238 214v16a18 18 0 0 1-18 18h-16M96 248H80a18 18 0 0 1-18-18v-16"/>
+        <g class="mesh">
+            <path d="M150 74L114 104 150 112 186 104zM114 104L104 150 132 140 150 112M186 104L196 150 168 140 150 112M132 140L150 168 168 140M104 150L122 196 150 168M196 150L178 196 150 168M122 196L150 222 178 196M150 168V222"/>
+        </g>
+        <path class="face" d="M150 72c-34 0-54 26-54 62 0 22 6 42 18 58 10 14 22 26 36 26s26-12 36-26c12-16 18-36 18-58 0-36-20-62-54-62z"/>
+        <path class="face" d="M120 128c6-5 14-5 20 0M160 128c6-5 14-5 20 0M150 136v28l-8 4M134 190c10 7 22 7 32 0"/>
+        <g class="node">
+            <circle cx="150" cy="74" r="2.4"/><circle cx="114" cy="104" r="2.4"/><circle cx="186" cy="104" r="2.4"/>
+            <circle cx="104" cy="150" r="2.4"/><circle cx="196" cy="150" r="2.4"/><circle cx="132" cy="140" r="2.4"/>
+            <circle cx="168" cy="140" r="2.4"/><circle cx="150" cy="168" r="2.4"/><circle cx="122" cy="196" r="2.4"/>
+            <circle cx="178" cy="196" r="2.4"/><circle cx="150" cy="222" r="2.4"/><circle cx="150" cy="112" r="2.4"/>
+        </g>
+        <g clip-path="url(#scan-clip)"><rect class="beam" x="62" y="12" width="176" height="60"/></g>
+    </svg>
+</div>

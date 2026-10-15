@@ -1,0 +1,115 @@
+services:
+  # ==========================================
+  # CompreFace Face Recognition Platform
+  # ==========================================
+  compreface-postgres-db:
+    profiles: ["production"]
+    image: postgres:13-alpine
+    container_name: compreface-postgres-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${COMPREFACE_POSTGRES_PASSWORD:?Set COMPREFACE_POSTGRES_PASSWORD for the production profile}
+      - POSTGRES_DB=compreface
+    volumes:
+      - compreface_postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - xface-network
+
+  compreface-admin:
+    profiles: ["production"]
+    image: exadel/compreface-admin:1.2.0
+    container_name: compreface-admin
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${COMPREFACE_POSTGRES_PASSWORD:?Set COMPREFACE_POSTGRES_PASSWORD for the production profile}
+      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/compreface
+    depends_on:
+      - compreface-postgres-db
+    restart: unless-stopped
+    networks:
+      - xface-network
+
+  compreface-api:
+    profiles: ["production"]
+    image: exadel/compreface-api:1.2.0
+    container_name: compreface-api
+    depends_on:
+      - compreface-admin
+    restart: unless-stopped
+    networks:
+      - xface-network
+
+  compreface-core:
+    profiles: ["production"]
+    image: exadel/compreface-core:1.2.0
+    container_name: compreface-core
+    environment:
+      - ML_PORT=3300
+    restart: unless-stopped
+    networks:
+      - xface-network
+
+  compreface-fe:
+    profiles: ["production"]
+    image: exadel/compreface-fe:1.2.0
+    container_name: compreface-ui
+    ports:
+      - "8000:80"
+    depends_on:
+      - compreface-api
+      - compreface-admin
+      - compreface-core
+    environment:
+      - CLIENT_MAX_BODY_SIZE=10M
+      - PROXY_READ_TIMEOUT=60s
+      - PROXY_CONNECT_TIMEOUT=60s
+    restart: unless-stopped
+    networks:
+      - xface-network
+
+  # ==========================================
+  # xFACE Biometric Access Control Platform
+  # ==========================================
+  xface:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xface-app
+    ports:
+      - "5000:5000"
+    environment:
+      - HOST=http://compreface-fe
+      - PORT=80
+      - API_KEY=${API_KEY:-}
+      - DETECTION_PROBABILITY_THRESHOLD=${DETECTION_PROBABILITY_THRESHOLD:-0.8}
+      - SIMILARITY_THRESHOLD=${SIMILARITY_THRESHOLD:-0.85}
+      - SHELLY_URL=${SHELLY_URL:-}
+      - SHELLY_COOLDOWN_SECONDS=${SHELLY_COOLDOWN_SECONDS:-10.0}
+      - SHELLY_TIMEOUT=${SHELLY_TIMEOUT:-3.0}
+      - DEVICE_NAME=${DEVICE_NAME:-Main Entrance}
+      - FACE_PLUGINS=${FACE_PLUGINS:-}
+      - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD:-}
+      - SECRET_KEY=${SECRET_KEY:-}
+      - MONITOR_REQUIRE_LOGIN=${MONITOR_REQUIRE_LOGIN:-true}
+      - DEMO_MODE=${DEMO_MODE:-true}
+      - CAMERA_INDEX=${CAMERA_INDEX:-0}
+      - CAMERA_WIDTH=${CAMERA_WIDTH:-640}
+      - CAMERA_HEIGHT=${CAMERA_HEIGHT:-480}
+      - CAMERA_FPS=${CAMERA_FPS:-30}
+      - RECOGNITION_INTERVAL=${RECOGNITION_INTERVAL:-0.8}
+      - SNAPSHOT_RETENTION_DAYS=${SNAPSHOT_RETENTION_DAYS:-30}
+      - DATA_DIR=/app/data
+    volumes:
+      - xface_data:/app/data
+    restart: unless-stopped
+    networks:
+      - xface-network
+
+networks:
+  xface-network:
+    driver: bridge
+
+volumes:
+  compreface_postgres_data:
+  xface_data:

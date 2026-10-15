@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+
+{% block title %}Live monitor{% endblock %}
+{% block page_id %}monitor{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <span class="eyebrow">{{ settings.DEVICE_NAME }}</span>
+        <h1>Live monitor</h1>
+        <p>Real-time recognition at the entrance: detection, identity match and door decision.</p>
+    </div>
+    <div class="actions">
+        <button class="btn" id="btn-kiosk" type="button" title="Hide navigation for a wall-mounted display">{{ icon('monitor') }} Kiosk mode</button>
+    </div>
+</div>
+
+<div class="kiosk">
+    <section class="stage" id="stage" aria-label="Live camera">
+        <img class="feed" id="live-stream-img" src="{{ url_for('video.stream') }}" alt="Live camera stream">
+        <div class="feed-grid"></div>
+        <div class="vignette"></div>
+        <div class="sweep"></div>
+        <div class="frame-corners"><i></i><i></i><i></i><i></i></div>
+        <svg class="faces" id="face-overlay" preserveAspectRatio="xMidYMid meet" viewBox="0 0 640 480" aria-hidden="true"></svg>
+
+        <div class="hud hud-top">
+            <span class="hud-pill rec" id="badge-live"><span class="dot"></span> LIVE</span>
+            <span class="hud-pill hide-sm" id="badge-stream-fps">—</span>
+            <div class="end">
+                <span class="hud-pill hide-sm" id="badge-faces">{{ icon('scan-face', 'i-sm') }} <span>0 faces</span></span>
+                <button class="btn btn-sm" id="btn-fullscreen" type="button" title="Toggle fullscreen">{{ icon('expand', 'i-sm') }} <span>Fullscreen</span></button>
+            </div>
+        </div>
+        <div class="hud hud-bottom">
+            <div class="hud-brand">{{ icon('logo') }}<div>xFACE Gateway<small>{{ settings.DEVICE_NAME }}</small></div></div>
+            <div class="end"><span class="hud-clock" data-clock>--:--:--</span></div>
+        </div>
+
+        <div class="stage-offline" id="stream-offline" hidden>
+            {{ icon('camera-off') }}
+            <strong>Camera offline</strong>
+            <span>Reconnecting to the video feed…</span>
+        </div>
+    </section>
+
+    <aside class="side">
+        <section class="decision" id="card-access-status" data-state="idle" aria-live="polite">
+            <span class="d-label">Recognition</span>
+            <div class="ring">
+                <svg viewBox="0 0 120 120" aria-hidden="true">
+                    <circle class="r-ticks" cx="60" cy="60" r="56"/>
+                    <circle class="r-track" cx="60" cy="60" r="50"/>
+                    <circle class="r-val" id="ring-value" cx="60" cy="60" r="50" pathLength="100"/>
+                    <circle class="r-thresh" id="ring-threshold" cx="60" cy="60" r="50" pathLength="100"/>
+                </svg>
+                <div class="ring-core"><svg class="i" id="status-icon" aria-hidden="true"><use href="#i-scan-face"/></svg></div>
+            </div>
+            <h2 id="status-subject-name">Ready</h2>
+            <p class="d-msg" id="status-message">Please look at the camera</p>
+            <div class="d-score" id="status-similarity-pill" hidden>
+                <strong id="status-similarity-val">0%</strong><small>similarity</small>
+            </div>
+        </section>
+
+        <section class="door" id="door-panel">
+            <div class="door-row">
+                <div class="door-icon" id="gate-icon"><svg class="i" aria-hidden="true"><use href="#i-door-closed"/></svg></div>
+                <div class="door-text">
+                    <small>Door lock</small>
+                    <strong id="relay-status-text">Locked</strong>
+                </div>
+                <span class="tag neutral" id="relay-status-badge">{{ icon('lock') }} Secured</span>
+            </div>
+            <div>
+                <div class="meter" role="progressbar" aria-label="Repeat-access cooldown"><span id="cooldown-progress" style="width:100%;background:var(--ok)"></span></div>
+                <div class="cooldown-meta"><span>Repeat-access cooldown</span><span class="mono" id="cooldown-timer-text">Ready</span></div>
+            </div>
+        </section>
+
+        <section class="panel feed">
+            <div class="panel-head">
+                <h2>{{ icon('history') }} Recent events</h2>
+                <span class="tag neutral" id="feed-count">0</span>
+            </div>
+            <ul class="feed-list" id="recent-access-feed">
+                <li class="feed-empty" data-placeholder>{{ icon('activity') }} Waiting for the first event</li>
+            </ul>
+        </section>
+    </aside>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/live_monitor.js') }}"></script>
+{% endblock %}

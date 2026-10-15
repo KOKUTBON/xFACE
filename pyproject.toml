@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xface"
+version = "2.0.0"
+description = "xFACE: open-source, self-hosted facial recognition access control"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Rei Doda" }
+]
+keywords = ["face-recognition", "access-control", "compreface", "opencv", "shelly", "flask", "biometrics"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Framework :: Flask",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Topic :: Security",
+]
+dependencies = [
+    "flask>=3.1.0",
+    "flask-cors>=6.0.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.8.0",
+    "python-dotenv>=1.1.0",
+    "sqlalchemy>=2.0.38",
+    "opencv-python>=4.10.0",
+    "pillow>=11.0.0",
+    "numpy>=2.0.0",
+    "requests>=2.32.0",
+]
+
+[project.optional-dependencies]
+server = ["gunicorn>=23.0.0"]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+]
+
+[project.urls]
+Homepage = "https://kokutbon.github.io/xFACE/"
+Issues = "https://github.com/KOKUTBON/xFACE/issues"
+
+[tool.setuptools.packages.find]
+include = ["xface*"]
+
+[tool.setuptools.package-data]
+xface = ["web/templates/*.html", "web/static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+pythonpath = ["."]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]

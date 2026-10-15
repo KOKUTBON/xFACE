@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% from "_macros.html" import icon %}
+
+{% block title %}Access logs{% endblock %}
+{% block page_id %}logs{% endblock %}
+
+{% block content %}
+<div class="page-head">
+    <div>
+        <span class="eyebrow">Audit trail</span>
+        <h1>Access logs</h1>
+        <p>Every biometric decision at the door, with similarity scores, relay outcome and snapshots.</p>
+    </div>
+    <div class="actions">
+        <button class="btn btn-icon" id="btn-refresh-logs" type="button" title="Refresh" aria-label="Refresh logs">{{ icon('refresh') }}</button>
+        <a href="{{ url_for('api_logs.export_csv') }}" class="btn btn-primary" id="btn-export-csv" title="Download the logs matching the current filters">{{ icon('download') }} Export CSV</a>
+    </div>
+</div>
+
+<div class="stats">
+    <article class="stat">
+        <span class="stat-label">Events today</span>
+        <span class="stat-icon">{{ icon('activity') }}</span>
+        <span class="stat-value" id="stat-today-total">—</span>
+        <span class="stat-note">Since local midnight</span>
+    </article>
+    <article class="stat ok">
+        <span class="stat-label">Granted today</span>
+        <span class="stat-icon">{{ icon('door-open') }}</span>
+        <span class="stat-value" id="stat-today-granted">—</span>
+        <span class="stat-note" id="stat-granted-rate">—</span>
+    </article>
+    <article class="stat warn">
+        <span class="stat-label">Rejected today</span>
+        <span class="stat-icon">{{ icon('user-x') }}</span>
+        <span class="stat-value" id="stat-today-unknown">—</span>
+        <span class="stat-note">Unknown or below threshold</span>
+    </article>
+    <article class="stat manual">
+        <span class="stat-label">All-time events</span>
+        <span class="stat-icon">{{ icon('database') }}</span>
+        <span class="stat-value" id="stat-all-time-total">—</span>
+        <span class="stat-note" id="stat-subjects-total">—</span>
+    </article>
+</div>
+
+<div class="logs-layout">
+    <section class="panel">
+        <form id="filter-logs-form" class="filters">
+            <div class="field">
+                <label class="label" for="filter-subject">Subject</label>
+                <div class="input-icon">
+                    {{ icon('search') }}
+                    <input type="search" class="input" id="filter-subject" data-search placeholder="Search a name">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label" for="filter-status">Decision</label>
+                <select class="select" id="filter-status">
+                    <option value="">All decisions</option>
+                    <option value="GRANTED">Granted</option>
+                    <option value="DENIED">Denied (below threshold)</option>
+                    <option value="UNKNOWN">Unknown face</option>
+                    <option value="MANUAL_OPEN">Manual open</option>
+                </select>
+            </div>
+            <div class="field">
+                <label class="label" for="filter-start-date">From</label>
+                <input type="date" class="input" id="filter-start-date">
+            </div>
+            <div class="field">
+                <label class="label" for="filter-end-date">To</label>
+                <input type="date" class="input" id="filter-end-date">
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">{{ icon('filter') }} Apply</button>
+                <button type="button" class="btn btn-icon" id="btn-reset-filters" title="Clear filters" aria-label="Clear filters">{{ icon('x') }}</button>
+            </div>
+        </form>
+
+        <div class="table-wrap">
+            <table class="table">
+                <caption class="sr-only">Access events</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Event</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Decision</th>
+                        <th scope="col">Similarity</th>
+                        <th scope="col">Relay</th>
+                        <th scope="col">Snapshot</th>
+                        <th scope="col">Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-table-body">
+                    <tr><td colspan="7" class="state-cell"><span class="spinner" style="display:inline-block;vertical-align:middle"></span>&nbsp; Loading events…</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-foot">
+            <span id="pagination-info"></span>
+            <nav class="pager" id="pagination-nav" aria-label="Access log pages"></nav>
+        </div>
+    </section>
+
+    <aside class="insight">
+        <section class="panel">
+            <div class="panel-head"><h2>{{ icon('gauge') }} Today's decisions</h2></div>
+            <div class="panel-body donut-wrap">
+                <div class="donut-center">
+                    <svg class="donut" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle class="track" cx="60" cy="60" r="50"/>
+                        <circle class="seg-ok" id="donut-ok" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="0 100"/>
+                        <circle class="seg-bad" id="donut-bad" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="0 100"/>
+                    </svg>
+                    <div class="val"><strong id="donut-rate">—</strong><small>granted</small></div>
+                </div>
+                <div class="legend">
+                    <div><i style="background:var(--ok)"></i> Granted <b id="legend-ok">—</b></div>
+                    <div><i style="background:var(--warn)"></i> Rejected <b id="legend-bad">—</b></div>
+                    <div><i style="background:var(--surface-3)"></i> Other <b id="legend-other">—</b></div>
+                </div>
+            </div>
+        </section>
+        <section class="panel">
+            <div class="panel-head"><h2>{{ icon('subjects') }} Most frequent</h2></div>
+            <div class="panel-body">
+                <ol class="rank" id="top-subjects"><li class="muted">—</li></ol>
+            </div>
+        </section>
+    </aside>
+</div>
+
+<!-- Dialog: Snapshot Preview -->
+<dialog class="modal wide" id="modalSnapshotPreview" aria-labelledby="modalSnapshotPreviewTitle">
+    <div class="modal-head">
+        <span class="m-icon">{{ icon('image') }}</span>
+        <div style="min-width:0"><h2 id="modalSnapshotPreviewTitle">Access snapshot</h2><p id="snapshot-preview-sub"></p></div>
+        <button type="button" class="btn btn-ghost btn-icon btn-sm" data-close aria-label="Close">{{ icon('x') }}</button>
+    </div>
+    <div class="modal-body">
+        <div class="snapshot-frame reticle"><span class="r-t"></span><span class="r-b"></span><img id="snapshot-preview-img" alt="Access snapshot"></div>
+        <div class="kv" id="snapshot-preview-details"></div>
+    </div>
+</dialog>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/access_logs.js') }}"></script>
+{% endblock %}
